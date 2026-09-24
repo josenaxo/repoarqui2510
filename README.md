@@ -1,4 +1,4 @@
-# Red Talento TP
+# Ceibbo
 
 > La red profesional para talento técnico-profesional. Conecta estudiantes, colegios y empresas.
 
@@ -6,7 +6,7 @@
 
 ## Descripción general
 
-**Red Talento TP** es una plataforma web inspirada en LinkedIn, diseñada específicamente para el ecosistema de colegios técnico-profesionales chilenos. Permite que estudiantes construyan una identidad profesional temprana, muestren sus habilidades y proyectos, reciban validaciones institucionales y postulen a oportunidades laborales.
+**Ceibbo** es una plataforma web inspirada en LinkedIn, diseñada específicamente para el ecosistema de colegios técnico-profesionales chilenos. Permite que estudiantes construyan una identidad profesional temprana, muestren sus habilidades y proyectos, reciban validaciones institucionales y postulen a oportunidades laborales.
 
 ---
 
