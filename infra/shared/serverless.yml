@@ -30,3 +30,17 @@ resources:
               - { AttributeName: GSI1SK, KeyType: RANGE }
             Projection: { ProjectionType: ALL }
         TimeToLiveSpecification: { AttributeName: ttl, Enabled: true }
+    
+    FilesBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: true
+          BlockPublicPolicy: true
+          IgnorePublicAcls: true
+          RestrictPublicBuckets: true
+        CorsConfiguration:
+          CorsRules:
+            - AllowedMethods: [PUT, GET]
+              AllowedOrigins: ['*']
+              AllowedHeaders: ['*']
