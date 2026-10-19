@@ -1,0 +1,32 @@
+# Infraestructura compartida de Ceibbo (tarea B1-02, Rol 1)
+# Despliegue: serverless deploy --stage <rol1|rol2|rol3|demo>
+service: ceibbo-shared
+frameworkVersion: '4'
+
+provider:
+  name: aws
+  region: us-east-1
+  stage: ${opt:stage, 'dev'}
+
+resources:
+  Resources:
+    AppTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ceibbo-app-${sls:stage}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - { AttributeName: PK, AttributeType: S }
+          - { AttributeName: SK, AttributeType: S }
+          - { AttributeName: GSI1PK, AttributeType: S }
+          - { AttributeName: GSI1SK, AttributeType: S }
+        KeySchema:
+          - { AttributeName: PK, KeyType: HASH }
+          - { AttributeName: SK, KeyType: RANGE }
+        GlobalSecondaryIndexes:
+          - IndexName: GSI1
+            KeySchema:
+              - { AttributeName: GSI1PK, KeyType: HASH }
+              - { AttributeName: GSI1SK, KeyType: RANGE }
+            Projection: { ProjectionType: ALL }
+        TimeToLiveSpecification: { AttributeName: ttl, Enabled: true }
