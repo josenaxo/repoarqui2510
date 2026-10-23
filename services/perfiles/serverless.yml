@@ -1,0 +1,43 @@
+service: ceibbo-perfiles
+frameworkVersion: "4"
+
+provider:
+  name: aws
+  runtime: nodejs22.x
+  region: us-east-1
+  stage: ${opt:stage, 'dev'}
+  iam:
+    role: !Sub arn:aws:iam::${AWS::AccountId}:role/LabRole
+  httpApi:
+    id: ${cf:ceibbo-shared-${sls:stage}.HttpApiId}
+  environment:
+    TABLE_NAME: ${cf:ceibbo-shared-${sls:stage}.TableName}
+    USER_POOL_ID: ${cf:ceibbo-shared-${sls:stage}.UserPoolId}
+
+functions:
+  perfiles:
+    handler: src/adapters/in/http.handler
+    timeout: 15
+    events:
+      - httpApi:
+          method: POST
+          path: /perfiles
+          authorizer: &cognito
+            type: jwt
+            id: ${cf:ceibbo-shared-${sls:stage}.AuthorizerId}
+      - httpApi:
+          method: GET
+          path: /perfiles/me
+          authorizer: *cognito
+      - httpApi:
+          method: PUT
+          path: /perfiles/me
+          authorizer: *cognito
+      - httpApi:
+          method: GET
+          path: /colegios/{id}/config
+          authorizer: *cognito
+      - httpApi:
+          method: PUT
+          path: /colegios/{id}/config
+          authorizer: *cognito

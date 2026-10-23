@@ -1,5 +1,30 @@
 # Ceibbo
 
+## Inicio rápido
+
+Desde la raíz del repositorio, en PowerShell use `npm.cmd` (algunas políticas de Windows bloquean `npm.ps1`):
+
+```powershell
+npm.cmd run setup
+npm.cmd run doctor
+npm.cmd run dev
+```
+
+La interfaz abre en `http://localhost:3000` y funciona con cuentas demo sin PostgreSQL. Para levantar también el backend heredado se necesita Docker Desktop:
+
+```powershell
+Copy-Item backend/.env.example backend/.env
+Copy-Item frontend/.env.example frontend/.env.local
+npm.cmd run local:up
+npm.cmd run dev:full
+```
+
+La adaptación académica hasta las Unidades I y II está documentada en `docs/arquitectura-unidades-i-ii.md`. Incluye patrones cloud, arquitectura serverless y limpia, modelos de servicio, Docker, despliegue estándar y despliegue canario. Se verifica con:
+
+```powershell
+npm.cmd run verify:unit2
+```
+
 > La red profesional para talento técnico-profesional. Conecta estudiantes, colegios y empresas.
 
 ---
@@ -241,9 +266,9 @@ Sin backend conectado, el login demo funciona con estos correos:
 
 | Rol | Email | Contraseña |
 |---|---|---|
-| Estudiante | matias@colegio.cl | demo123 |
-| Empresa | rrhh@techcorp.cl | demo123 |
-| Colegio | admin@itm.cl | demo123 |
+| Estudiante | matias.arancibia@alumnos.colegiocaro.cl | Demo1234! |
+| Empresa | techsolutions@redtalento.cl | Demo1234! |
+| Colegio | colegio@redtalento.cl | Demo1234! |
 
 ---
 
@@ -346,8 +371,9 @@ Sección de evidencias por tipo: proyectos, certificados, fotos, descripciones. 
 - ✅ Rutas protegidas por rol
 - ✅ Upload de archivos (Multer, almacenamiento local) para avatares, covers, evidencias y publicaciones
 - ⏳ WebSockets para mensajería en tiempo real (próximo paso)
-- ⏳ Tests unitarios e integración
-- ⏳ Docker Compose para desarrollo local
+- ✅ Pruebas unitarias de los cuatro servicios serverless de Unidad I-II
+- ✅ Docker Compose para PostgreSQL y DynamoDB Local
+- ✅ Despliegue estándar y canario documentado y automatizado
 - ⏳ CI/CD pipeline
 
 ---
@@ -357,9 +383,9 @@ Sección de evidencias por tipo: proyectos, certificados, fotos, descripciones. 
 1. **WebSockets** — mensajería en tiempo real con `@nestjs/websockets`
 2. **Notificaciones** — sistema de notificaciones in-app
 3. **Carga masiva real** — parser CSV/XLSX en el backend con validación y reporte de errores
-4. **Tests** — Jest para servicios, Supertest para e2e
-5. **Docker Compose** — levantar PostgreSQL + backend + frontend con un solo comando
-6. **Despliegue** — configuración para Vercel (frontend) + Railway/Render (backend)
+4. **Tests** — ampliar con integración contra DynamoDB Local y pruebas e2e
+5. **CI/CD** — automatizar pruebas y despliegues en la Unidad III
+6. **Despliegue frontend** — configurar Vercel o Amplify
 
 ---
 

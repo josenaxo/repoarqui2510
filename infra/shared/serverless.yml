@@ -1,0 +1,147 @@
+service: ceibbo-shared
+frameworkVersion: "4"
+
+provider:
+  name: aws
+  region: us-east-1
+  stage: ${opt:stage, 'dev'}
+
+resources:
+  Resources:
+    AppTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ceibbo-app-${sls:stage}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: PK
+            AttributeType: S
+          - AttributeName: SK
+            AttributeType: S
+          - AttributeName: GSI1PK
+            AttributeType: S
+          - AttributeName: GSI1SK
+            AttributeType: S
+        KeySchema:
+          - AttributeName: PK
+            KeyType: HASH
+          - AttributeName: SK
+            KeyType: RANGE
+        GlobalSecondaryIndexes:
+          - IndexName: GSI1
+            KeySchema:
+              - AttributeName: GSI1PK
+                KeyType: HASH
+              - AttributeName: GSI1SK
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+        TimeToLiveSpecification:
+          AttributeName: ttl
+          Enabled: true
+
+    FilesBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: true
+          BlockPublicPolicy: true
+          IgnorePublicAcls: true
+          RestrictPublicBuckets: true
+        CorsConfiguration:
+          CorsRules:
+            - AllowedMethods: [PUT, GET]
+              AllowedOrigins: ['*']
+              AllowedHeaders: ['*']
+
+    EventsDLQ:
+      Type: AWS::SQS::Queue
+
+    EventsQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        VisibilityTimeout: 210
+        RedrivePolicy:
+          deadLetterTargetArn: !GetAtt EventsDLQ.Arn
+          maxReceiveCount: 5
+
+    UserPool:
+      Type: AWS::Cognito::UserPool
+      Properties:
+        UserPoolName: ceibbo-${sls:stage}
+        UsernameAttributes: [email]
+        AutoVerifiedAttributes: [email]
+
+    UserPoolClient:
+      Type: AWS::Cognito::UserPoolClient
+      Properties:
+        UserPoolId: !Ref UserPool
+        GenerateSecret: false
+        ExplicitAuthFlows:
+          - ALLOW_USER_SRP_AUTH
+          - ALLOW_USER_PASSWORD_AUTH
+          - ALLOW_REFRESH_TOKEN_AUTH
+
+    GrupoEstudiante:
+      Type: AWS::Cognito::UserPoolGroup
+      Properties:
+        UserPoolId: !Ref UserPool
+        GroupName: estudiante
+    GrupoEmpresa:
+      Type: AWS::Cognito::UserPoolGroup
+      Properties:
+        UserPoolId: !Ref UserPool
+        GroupName: empresa
+    GrupoColegio:
+      Type: AWS::Cognito::UserPoolGroup
+      Properties:
+        UserPoolId: !Ref UserPool
+        GroupName: colegio
+
+    HttpApi:
+      Type: AWS::ApiGatewayV2::Api
+      Properties:
+        Name: ceibbo-${sls:stage}
+        ProtocolType: HTTP
+        CorsConfiguration:
+          AllowOrigins: ['*']
+          AllowMethods: [GET, POST, PUT, PATCH, DELETE, OPTIONS]
+          AllowHeaders: [Authorization, Content-Type]
+
+    HttpApiStage:
+      Type: AWS::ApiGatewayV2::Stage
+      Properties:
+        ApiId: !Ref HttpApi
+        StageName: $default
+        AutoDeploy: true
+
+    CognitoAuthorizer:
+      Type: AWS::ApiGatewayV2::Authorizer
+      Properties:
+        ApiId: !Ref HttpApi
+        Name: cognito
+        AuthorizerType: JWT
+        IdentitySource: [$request.header.Authorization]
+        JwtConfiguration:
+          Issuer: !Sub https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}
+          Audience: [!Ref UserPoolClient]
+
+  Outputs:
+    TableName:
+      Value: !Ref AppTable
+    BucketName:
+      Value: !Ref FilesBucket
+    EventsQueueUrl:
+      Value: !Ref EventsQueue
+    EventsQueueArn:
+      Value: !GetAtt EventsQueue.Arn
+    UserPoolId:
+      Value: !Ref UserPool
+    UserPoolClientId:
+      Value: !Ref UserPoolClient
+    HttpApiId:
+      Value: !Ref HttpApi
+    HttpApiUrl:
+      Value: !GetAtt HttpApi.ApiEndpoint
+    AuthorizerId:
+      Value: !Ref CognitoAuthorizer

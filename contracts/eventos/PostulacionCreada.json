@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ceibbo.cl/contracts/eventos/PostulacionCreada.v1.json",
+  "title": "PostulacionCreada",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["tipo", "version", "id", "fecha", "destinatarioId", "datos"],
+  "properties": {
+    "tipo": { "const": "PostulacionCreada" },
+    "version": { "const": 1 },
+    "id": { "type": "string", "format": "uuid" },
+    "fecha": { "type": "string", "format": "date-time" },
+    "destinatarioId": { "type": "string", "minLength": 1 },
+    "datos": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["oportunidadId", "estudianteId", "titulo"],
+      "properties": {
+        "oportunidadId": { "type": "string" },
+        "estudianteId": { "type": "string" },
+        "titulo": { "type": "string" }
+      }
+    }
+  }
+}

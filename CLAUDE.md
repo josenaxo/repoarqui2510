@@ -83,7 +83,7 @@ Each feature is an independent NestJS module under `backend/src/`:
 
 **Auth flow:** `JwtAuthGuard` is global (registered in `AuthModule`). Routes opt out with `@Public()`. `RolesGuard` reads the role from the JWT payload (no DB query on each request).
 
-**Database:** TypeORM with `autoLoadEntities: true`. In development, `synchronize: true` updates the schema automatically. The `app.module.ts` has a duplicate `TypeOrmModule.forRoot` (the second one is a static fallback from an earlier iteration) — only the `forRootAsync` block is the active config-driven connection.
+**Database:** TypeORM uses one config-driven `forRootAsync` connection with `autoLoadEntities: true`. In development, `synchronize: true` updates the legacy PostgreSQL schema automatically. The Unit I-II migration adds independent Lambda services backed by DynamoDB under `services/`; see `docs/arquitectura-unidades-i-ii.md`.
 
 ## Design System
 
