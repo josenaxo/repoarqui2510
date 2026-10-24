@@ -127,3 +127,15 @@ resources:
           Issuer: !Sub https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}
           Audience:
             - !Ref UserPoolClient
+  
+  # Directorio: valores que leen los servicios con ${cf:ceibbo-shared-<stage>.Nombre}
+  Outputs:
+    TableName: { Value: !Ref AppTable }
+    BucketName: { Value: !Ref FilesBucket }
+    EventsQueueUrl: { Value: !Ref EventsQueue }
+    EventsQueueArn: { Value: !GetAtt EventsQueue.Arn }
+    UserPoolId: { Value: !Ref UserPool }
+    UserPoolClientId: { Value: !Ref UserPoolClient }
+    HttpApiId: { Value: !Ref HttpApi }
+    HttpApiUrl: { Value: !GetAtt HttpApi.ApiEndpoint }
+    AuthorizerId: { Value: !Ref CognitoAuthorizer }
