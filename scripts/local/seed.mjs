@@ -19,6 +19,7 @@ const datos = [
   // Configuración del colegio (personalización por colegio)
   {
     PK: "SCHOOL#school-1", SK: "CONFIG",
+    GSI1PK: "SCHOOLS", GSI1SK: "SCHOOL#school-1",
     nombre: "Instituto Técnico Metropolitano",
     colorPrincipal: "#0F4C5C",
     logo: "/logos/colegio.svg",
@@ -27,6 +28,7 @@ const datos = [
 
   // Perfil del usuario colegio
   { PK: "USER#school-usr", SK: "PROFILE", tipo: "colegio", colegioId: "school-1", email: "admin@itm.cl" },
+  
 
   // Perfiles de estudiantes (GSI1 permite listar los estudiantes de un colegio)
   {
