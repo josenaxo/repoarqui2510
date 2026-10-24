@@ -65,4 +65,14 @@ resources:
           - email
         AutoVerifiedAttributes:
           - email
+    
+    UserPoolClient:
+      Type: AWS::Cognito::UserPoolClient
+      Properties:
+        UserPoolId: !Ref UserPool
+        GenerateSecret: false
+        ExplicitAuthFlows:
+          - ALLOW_USER_SRP_AUTH
+          - ALLOW_USER_PASSWORD_AUTH # solo para tokens de prueba (B1-17)
+          - ALLOW_REFRESH_TOKEN_AUTH
 
