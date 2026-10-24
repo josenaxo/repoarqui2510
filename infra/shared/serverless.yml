@@ -44,3 +44,16 @@ resources:
             - AllowedMethods: [PUT, GET]
               AllowedOrigins: ['*']
               AllowedHeaders: ['*']
+    EventsDLQ:
+      Type: AWS::SQS::Queue # Elegir el servicio de aws
+      Properties:
+        MessageRetentionPeriod: 1209600 # El máximo, son 14 días
+    # La cola principal
+    EventsQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        VisibilityTimeout: 210 # al menos 6 veces el timeout de Lambda para procesar una cola
+        RedrivePolicy: 
+          deadLetterTargetArn: !GetAtt EventsDLQ.Arn # Manda las que fallasn a DLQ
+          maxReceiveCount: 5 # Numero de fallos antes de mandarlo a DLQ
+
