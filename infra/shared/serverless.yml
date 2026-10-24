@@ -112,4 +112,18 @@ resources:
         ApiId: !Ref HttpApi
         StageName: '$default'
         AutoDeploy: true
+    
 
+    # Guardia: revisa el token de Cognito antes de llegar a la Lambda
+    CognitoAuthorizer:
+      Type: AWS::ApiGatewayV2::Authorizer
+      Properties:
+        ApiId: !Ref HttpApi
+        Name: cognito
+        AuthorizerType: JWT
+        IdentitySource:
+          - '$request.header.Authorization'
+        JwtConfiguration:
+          Issuer: !Sub https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}
+          Audience:
+            - !Ref UserPoolClient
