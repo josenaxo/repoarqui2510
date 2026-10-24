@@ -5,6 +5,6 @@
   "description": "Servicio perfiles de Ceibbo: perfiles de usuario y config por colegio",
   "type": "module",
   "scripts": {
-    "test": "node --test"
+    "test": "node --test \"test/**/*.test.mjs\""
   }
 }
