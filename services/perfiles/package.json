@@ -1,0 +1,10 @@
+{
+  "name": "ceibbo-perfiles",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Servicio perfiles de Ceibbo: perfiles de usuario y config por colegio",
+  "type": "module",
+  "scripts": {
+    "test": "node --test"
+  }
+}
