@@ -56,4 +56,13 @@ resources:
         RedrivePolicy: 
           deadLetterTargetArn: !GetAtt EventsDLQ.Arn # Manda las que fallasn a DLQ
           maxReceiveCount: 5 # Numero de fallos antes de mandarlo a DLQ
+    #Usuarios de Ceibbo con Cognito
+    UserPool:
+      Type: AWS::Cognito::UserPool
+      Properties:
+        UserPoolName: ceibbo-${sls:stage}
+        UsernameAttributes:
+          - email
+        AutoVerifiedAttributes:
+          - email
 
