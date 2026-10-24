@@ -75,4 +75,23 @@ resources:
           - ALLOW_USER_SRP_AUTH
           - ALLOW_USER_PASSWORD_AUTH # solo para tokens de prueba (B1-17)
           - ALLOW_REFRESH_TOKEN_AUTH
+    
+    # Tipos de usuario: el grupo viaja en el token (cognito:groups)
+    GrupoEstudiante:
+      Type: AWS::Cognito::UserPoolGroup
+      Properties:
+        UserPoolId: !Ref UserPool
+        GroupName: estudiante
+
+    GrupoEmpresa:
+      Type: AWS::Cognito::UserPoolGroup
+      Properties:
+        UserPoolId: !Ref UserPool
+        GroupName: empresa
+
+    GrupoColegio:
+      Type: AWS::Cognito::UserPoolGroup
+      Properties:
+        UserPoolId: !Ref UserPool
+        GroupName: colegio
 
