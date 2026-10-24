@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "test": "node --test \"test/*.test.mjs\"",
-    "test:integracion": "echo \"Pendiente: la completa el Rol 3 en B1-11\""
+    "test:integracion": "node ../../scripts/local/crear-tabla.mjs && node ../../scripts/local/seed.mjs && node --test \"test/integracion/*.test.mjs\""
   },
   "devDependencies": {
     "@aws-sdk/client-dynamodb": "^3.1156.0",
