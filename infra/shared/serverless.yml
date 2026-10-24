@@ -94,4 +94,22 @@ resources:
       Properties:
         UserPoolId: !Ref UserPool
         GroupName: colegio
+    
+    # Puerta de entrada única para todos los servicios
+    HttpApi:
+      Type: AWS::ApiGatewayV2::Api
+      Properties:
+        Name: ceibbo-${sls:stage}
+        ProtocolType: HTTP
+        CorsConfiguration:
+          AllowOrigins: ['*'] # restringir en el diseño de seguridad
+          AllowMethods: [GET, POST, PUT, PATCH, DELETE, OPTIONS]
+          AllowHeaders: [Authorization, Content-Type]
+
+    HttpApiStage:
+      Type: AWS::ApiGatewayV2::Stage
+      Properties:
+        ApiId: !Ref HttpApi
+        StageName: '$default'
+        AutoDeploy: true
 
