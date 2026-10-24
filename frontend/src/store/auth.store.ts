@@ -22,8 +22,6 @@ const demoAccounts: Record<string, { password: string; role: AuthUser['role']; u
   },
 }
 
-const demoMode = (process.env.NEXT_PUBLIC_DEMO_MODE ?? (process.env.NODE_ENV === 'development' ? 'true' : 'false')) === 'true'
-
 function buildDemoSession(credentials: LoginDto) {
   const email = credentials.email.trim().toLowerCase()
   const account = demoAccounts[email]
@@ -58,21 +56,6 @@ export const useAuthStore = create<AuthState>()(
       login: async (credentials: LoginDto) => {
         set({ isLoading: true })
         try {
-          const localDemoSession = demoMode ? buildDemoSession(credentials) : null
-          if (localDemoSession) {
-            if (typeof window !== 'undefined') {
-              localStorage.setItem('access_token', localDemoSession.tokens.accessToken)
-              localStorage.setItem('refresh_token', localDemoSession.tokens.refreshToken)
-            }
-            set({
-              user: localDemoSession.user,
-              tokens: localDemoSession.tokens,
-              isAuthenticated: true,
-              isLoading: false,
-            })
-            return
-          }
-
           // Backend returns: { accessToken, refreshToken, role, userId }
           const response = await api.post<{
             accessToken: string
