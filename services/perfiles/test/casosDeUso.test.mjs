@@ -24,7 +24,10 @@ const colegio = { id: "col-1", username: "col-1", grupos: ["colegio"] };
 // cada test parte con datos nuevos para que no se afecten entre ellos
 function escenario() {
   const repositorio = crearRepositorioEnMemoria({
-    colegios: [{ id: "school-1", nombre: "ITM", colorPrincipal: "#0F4C5C" }],
+    colegios: [
+      { id: "school-1", nombre: "ITM", colorPrincipal: "#0F4C5C", especialidades: ["Programación", "Electricidad"] },
+      { id: "school-2", nombre: "Liceo B", especialidades: ["Contabilidad"] },
+    ],
     perfiles: [{ userId: "col-1", tipo: "colegio", colegioId: "school-1" }],
   });
   const identidad = crearIdentidadFalsa();
@@ -119,6 +122,32 @@ describe("actualizarPerfil", () => {
     const { deps } = escenario();
     await assert.rejects(actualizarPerfil(deps, { actor: { id: "otro", grupos: [] }, cambios: { bio: "x" } }), conCodigo(CODIGOS.NO_ENCONTRADO));
   });
+
+  it("acepta una especialidad que imparte su colegio", async () => {
+    const { deps } = await escenarioConEstudiante();
+    const perfil = await actualizarPerfil(deps, { actor: estudiante, cambios: { especialidad: "Programación" } });
+    assert.equal(perfil.especialidad, "Programación");
+  });
+
+  it("rechaza una especialidad oficial que su colegio no imparte", async () => {
+    const { deps } = await escenarioConEstudiante();
+    await assert.rejects(actualizarPerfil(deps, { actor: estudiante, cambios: { especialidad: "Contabilidad" } }), conCodigo(CODIGOS.VALIDACION));
+  });
+
+  it("al cambiar de colegio revisa la especialidad contra el colegio nuevo", async () => {
+    const { deps } = await escenarioConEstudiante();
+    const perfil = await actualizarPerfil(deps, { actor: estudiante, cambios: { colegioId: "school-2", especialidad: "Contabilidad" } });
+    assert.equal(perfil.especialidad, "Contabilidad");
+    await assert.rejects(
+      actualizarPerfil(deps, { actor: estudiante, cambios: { colegioId: "school-1", especialidad: "Contabilidad" } }),
+      conCodigo(CODIGOS.VALIDACION),
+    );
+  });
+
+  it("sin colegio no se puede elegir especialidad", async () => {
+    const { deps } = await escenarioConEstudiante();
+    await assert.rejects(actualizarPerfil(deps, { actor: estudiante, cambios: { colegioId: "", especialidad: "Programación" } }), conCodigo(CODIGOS.VALIDACION));
+  });
 });
 
 describe("config del colegio", () => {
@@ -160,7 +189,7 @@ describe("listados", () => {
   it("lista los colegios para el selector", async () => {
     const { deps } = escenario();
     const colegios = await listarColegios(deps, { actor: estudiante });
-    assert.deepEqual(colegios.map((c) => c.id), ["school-1"]);
+    assert.deepEqual(colegios.map((c) => c.id), ["school-1", "school-2"]);
   });
 
   it("lista los estudiantes del colegio con total y promedio", async () => {

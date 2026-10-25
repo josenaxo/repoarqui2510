@@ -37,6 +37,7 @@
 - Al editar un perfil se escriben **solo los campos enviados y validados**, para no pisar un `readinessScore` que otro proceso actualice al mismo tiempo (*lost update*).
 - Al editar la configuración de un colegio (`PutItem`), el adaptador **vuelve a escribir `GSI1PK = SCHOOLS`**; si no, el colegio desaparecería del listado.
 - El registro hace dos pasos sin transacción entre ellos (agregar al grupo en Cognito y crear el perfil en DynamoDB). Ambos son **idempotentes**, así que reintentar después de una falla deja todo consistente.
+- Las **especialidades son solo las oficiales del Mineduc** (listado TP de 3° y 4° medio: 15 sectores, 35 especialidades y 17 menciones; Bases Curriculares del Decreto 452 de 2013 más Mecánica de Mantenimiento de Aeronaves). El colegio elige de esa lista las que imparte, y el estudiante elige la suya de la lista de su colegio. La lista está en `services/perfiles/src/domain/especialidades.mjs`.
 - El access token de Cognito no trae el `email`: el perfil lo guarda solo si viene en el token.
 
 ## Pendientes para la fase 2
