@@ -206,7 +206,7 @@ components:
         nombre: { type: string, maxLength: 60, example: Matías }
         apellido: { type: string, maxLength: 60, example: Arancibia }
         colegioId: { type: string, example: school-1 }
-        especialidad: { type: string, maxLength: 80, example: Ingeniería Civil Informática }
+        especialidad: { type: string, maxLength: 80, example: Programación, description: "Una de las especialidades TP oficiales del Mineduc (sola o con su mención), y que imparta el colegio del estudiante. Vacía para quitarla." }
 
     PerfilEditable:
       type: object
@@ -216,7 +216,7 @@ components:
         apellido: { type: string, maxLength: 60 }
         titular: { type: string, maxLength: 120 }
         bio: { type: string, maxLength: 1000 }
-        especialidad: { type: string, maxLength: 80 }
+        especialidad: { type: string, maxLength: 80, description: "Una de las especialidades TP oficiales del Mineduc (sola o con su mención), y que imparta el colegio del estudiante. Vacía para quitarla." }
         anio: { type: integer, minimum: 1, maximum: 7 }
         telefono: { type: string, maxLength: 20 }
         ubicacion: { type: string, maxLength: 80 }
@@ -256,7 +256,9 @@ components:
         sitioWeb: { type: string, format: uri }
         especialidades:
           type: array
-          items: { type: string }
+          maxItems: 20
+          description: Especialidades que imparte el colegio. Solo se aceptan las TP oficiales del Mineduc, solas o con su mención, por ejemplo "Gastronomía" o "Gastronomía - Mención Cocina".
+          items: { type: string, maxLength: 80 }
         logo: { type: string }
         colorPrincipal:
           type: string

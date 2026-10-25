@@ -30,4 +30,17 @@ export async function exigirColegioExistente(repositorio, colegioId) {
   if (!colegio) {
     throw new ErrorDominio(CODIGOS.VALIDACION, "El colegio indicado no existe");
   }
+  return colegio;
+}
+
+// La especialidad del estudiante tiene que ser una de las que imparte su colegio
+export async function exigirEspecialidadDelColegio(repositorio, colegioId, especialidad) {
+  if (!especialidad) return;
+  if (!colegioId) {
+    throw new ErrorDominio(CODIGOS.VALIDACION, "Elige tu colegio antes que tu especialidad");
+  }
+  const colegio = await exigirColegioExistente(repositorio, colegioId);
+  if (!(colegio.especialidades ?? []).includes(especialidad)) {
+    throw new ErrorDominio(CODIGOS.VALIDACION, "Tu colegio no imparte esa especialidad");
+  }
 }

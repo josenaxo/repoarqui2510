@@ -1,6 +1,7 @@
 // Reglas del perfil, no depende de aws ni de http (ver docs/datos/perfiles.md)
 import { ErrorDominio, CODIGOS } from "./errores.mjs";
 import { esTextoNoVacio, validarTexto, validarEnlace } from "./validaciones.mjs";
+import { esEspecialidadOficial } from "./especialidades.mjs";
 
 export const TIPOS = ["estudiante", "empresa", "colegio"];
 
@@ -27,9 +28,19 @@ function validarAnio(valor) {
   return valor;
 }
 
+// vacia se acepta para quitarla. Que la imparta su colegio se revisa en el caso de uso, porque necesita la base
+function validarEspecialidad(valor, largoMaximo) {
+  const limpio = validarTexto("especialidad", valor, largoMaximo);
+  if (limpio !== "" && !esEspecialidadOficial(limpio)) {
+    throw new ErrorDominio(CODIGOS.VALIDACION, `"${limpio}" no es una especialidad aprobada por el Mineduc`);
+  }
+  return limpio;
+}
+
 function validarCampo(campo, valor, largoMaximo) {
   if (campo === "anio") return validarAnio(valor);
   if (campo === "sitioWeb") return validarEnlace(campo, valor, largoMaximo);
+  if (campo === "especialidad") return validarEspecialidad(valor, largoMaximo);
   return validarTexto(campo, valor, largoMaximo);
 }
 

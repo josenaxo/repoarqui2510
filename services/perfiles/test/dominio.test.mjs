@@ -3,6 +3,7 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { crearPerfilEstudiante, aplicarCambios, validarCambios } from "../src/domain/Perfil.mjs";
 import { validarConfigColegio } from "../src/domain/ConfigColegio.mjs";
+import { SECTORES, ESPECIALIDADES_OFICIALES } from "../src/domain/especialidades.mjs";
 import { CODIGOS } from "../src/domain/errores.mjs";
 
 const conCodigo = (codigo) => (error) => error.codigo === codigo;
@@ -95,12 +96,38 @@ describe("ConfigColegio", () => {
   });
 
   it("limita las especialidades a 20 textos", () => {
-    assert.throws(() => validarConfigColegio({ nombre: "ITM", especialidades: Array(21).fill("Redes") }), conCodigo(CODIGOS.VALIDACION));
-    assert.throws(() => validarConfigColegio({ nombre: "ITM", especialidades: ["Redes", 5] }), conCodigo(CODIGOS.VALIDACION));
+    assert.throws(() => validarConfigColegio({ nombre: "ITM", especialidades: Array(21).fill("Programación") }), conCodigo(CODIGOS.VALIDACION));
+    assert.throws(() => validarConfigColegio({ nombre: "ITM", especialidades: ["Programación", 5] }), conCodigo(CODIGOS.VALIDACION));
+  });
+
+  it("solo acepta especialidades oficiales del Mineduc y quita las repetidas", () => {
+    const config = validarConfigColegio({ nombre: "ITM", especialidades: ["Programación", "Gastronomía - Mención Cocina", "Programación"] });
+    assert.deepEqual(config.especialidades, ["Programación", "Gastronomía - Mención Cocina"]);
+    assert.throws(() => validarConfigColegio({ nombre: "ITM", especialidades: ["Redes y Telecomunicaciones"] }), conCodigo(CODIGOS.VALIDACION));
+    // en 3° medio todavia no hay mencion, asi que la especialidad sola tambien vale
+    assert.deepEqual(validarConfigColegio({ nombre: "ITM", especialidades: ["Gastronomía"] }).especialidades, ["Gastronomía"]);
+    assert.throws(() => validarConfigColegio({ nombre: "ITM", especialidades: ["Gastronomía - Mención Panadería"] }), conCodigo(CODIGOS.VALIDACION));
   });
 
   it("limpia espacios y deja solo los campos conocidos", () => {
     const config = validarConfigColegio({ nombre: " ITM ", bienvenida: "Hola", otro: "x" });
     assert.deepEqual(config, { nombre: "ITM", bienvenida: "Hola" });
+  });
+});
+
+describe("especialidades oficiales", () => {
+  it("son las del listado TP del Mineduc: 15 sectores, 35 especialidades y 17 menciones", () => {
+    const especialidades = SECTORES.flatMap((s) => s.especialidades);
+    assert.equal(SECTORES.length, 15);
+    assert.equal(especialidades.length, 35);
+    assert.equal(especialidades.flatMap((e) => e.menciones ?? []).length, 17);
+    // cada especialidad sola mas cada mencion
+    assert.equal(ESPECIALIDADES_OFICIALES.length, 52);
+  });
+
+  it("el perfil solo acepta una especialidad oficial, o vacia para quitarla", () => {
+    assert.equal(validarCambios("estudiante", { especialidad: "Programación" }).especialidad, "Programación");
+    assert.equal(validarCambios("estudiante", { especialidad: "" }).especialidad, "");
+    assert.throws(() => validarCambios("estudiante", { especialidad: "informatica" }), conCodigo(CODIGOS.VALIDACION));
   });
 });
