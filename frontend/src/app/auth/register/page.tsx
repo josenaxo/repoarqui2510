@@ -10,7 +10,7 @@ import { Input, PasswordInput } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { CeibboLogoMark } from '@/components/ui/CeibboLogoMark'
 import { useAuthStore } from '@/store/auth.store'
-import { api } from '@/lib/api-client'
+import { registrarPerfil } from '@/lib/api/perfiles'
 import { registrar, confirmarRegistro, reenviarCodigo } from '@/lib/cognito'
 import { cn } from '@/lib/utils'
 import { usePageTitle } from '@/lib/usePageTitle'
@@ -101,7 +101,7 @@ function RegisterPage() {
   // para que el token traiga el grupo estudiante que le puso perfiles
   const terminarRegistro = async (datos: FormValues) => {
     await login({ email: datos.email, password: datos.password })
-    await api.post('/perfiles', {
+    await registrarPerfil({
       nombre:       datos.firstName,
       apellido:     datos.lastName,
       anio:         typeof datos.year === 'number' ? datos.year : undefined,
